@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tailnet 脑洞玩法大全 — 从自嗨到挣钱</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --card: #161b22;
+    --card2: #1c2330;
+    --border: #2d333f;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --orange: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+    --cyan: #39c5cf;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7;
+    padding: 40px 20px;
+  }
+  .container { max-width: 1080px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 50px; }
+  header h1 {
+    font-size: 2.4em;
+    background: linear-gradient(90deg, var(--cyan), var(--purple), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+  header p { color: var(--muted); font-size: 1.05em; }
+  .date { color: var(--muted); font-size: 0.85em; margin-top: 8px; }
+
+  h2 {
+    font-size: 1.5em;
+    margin: 55px 0 8px;
+    padding-left: 14px;
+    border-left: 4px solid var(--cyan);
+  }
+  h2.money { border-left-color: var(--green); }
+  h2.wild { border-left-color: var(--purple); }
+  h2.warn { border-left-color: var(--red); }
+  .section-sub { color: var(--muted); margin-bottom: 24px; padding-left: 18px; font-size: 0.95em; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform .15s, border-color .15s;
+  }
+  .card:hover { transform: translateY(-3px); border-color: var(--cyan); }
+  .card h3 { font-size: 1.1em; margin-bottom: 8px; }
+  .card h3 .emoji { margin-right: 6px; }
+  .card p { color: var(--muted); font-size: 0.92em; }
+  .card ul { margin: 10px 0 0 18px; color: var(--muted); font-size: 0.92em; }
+  .card li { margin-bottom: 4px; }
+  .card .highlight { color: var(--text); }
+
+  .badges { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge {
+    font-size: 0.72em;
+    padding: 2px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+  .b-green  { color: var(--green);  border-color: var(--green); }
+  .b-blue   { color: var(--blue);   border-color: var(--blue); }
+  .b-orange { color: var(--orange); border-color: var(--orange); }
+  .b-red    { color: var(--red);    border-color: var(--red); }
+  .b-purple { color: var(--purple); border-color: var(--purple); }
+  .b-cyan   { color: var(--cyan);   border-color: var(--cyan); }
+
+  .diagram {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 0.92em; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 0.85em; }
+  td:first-child { font-weight: 600; white-space: nowrap; }
+
+  .callout {
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 0.95em;
+  }
+  .callout-red { background: rgba(248,81,73,.08); border: 1px solid rgba(248,81,73,.4); }
+  .callout-green { background: rgba(63,185,80,.08); border: 1px solid rgba(63,185,80,.4); }
+  .callout-blue { background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.4); }
+  .callout strong { color: var(--text); }
+  .callout p { color: var(--muted); margin-top: 4px; }
+
+  .roadmap { counter-reset: step; margin-top: 20px; }
+  .step {
+    display: flex;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px dashed var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    counter-increment: step;
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--card2);
+    border: 2px solid var(--cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1.1em; color: var(--cyan);
+  }
+  .step-num::before { content: counter(step); }
+  .step-body h4 { margin-bottom: 4px; font-size: 1.05em; }
+  .step-body p { color: var(--muted); font-size: 0.92em; }
+  .step-body code {
+    background: var(--card2);
+    padding: 1px 7px;
+    border-radius: 5px;
+    font-size: 0.85em;
+    color: var(--cyan);
+  }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.8em; margin-top: 70px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>🌐 Tailnet 脑洞玩法大全</h1>
+  <p>一堆服务器 + 家里 NAS + 海外节点 = 你的私人云。从自嗨到挣钱，一次想全。</p>
+  <div class="date">2026-07-21 · 头脑风暴文档</div>
+</header>
+
+<!-- ============ 资产盘点 ============ -->
+<h2>🧩 你手里的牌</h2>
+<p class="section-sub">先盘清楚资产，才知道能组合出什么。</p>
+
+<div class="diagram">
+  <svg viewBox="0 0 1000 340" width="100%" style="min-width:760px" font-family="-apple-system, PingFang SC, sans-serif">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#39c5cf"/>
+      </marker>
+    </defs>
+
+    <!-- tailnet cloud -->
+    <ellipse cx="500" cy="165" rx="300" ry="120" fill="rgba(57,197,207,0.05)" stroke="#39c5cf" stroke-dasharray="6 5" stroke-width="1.5"/>
+    <text x="500" y="68" text-anchor="middle" fill="#39c5cf" font-size="15" font-weight="700">你的 tailnet（加密内网 · 100.x.x.x）</text>
+
+    <!-- nodes -->
+    <g>
+      <rect x="230" y="105" width="150" height="58" rx="10" fill="#161b22" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="305" y="130" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600">🇨🇳 国内 VPS × N</text>
+      <text x="305" y="150" text-anchor="middle" fill="#8b949e" font-size="11">Happy · 博客 · 面向国内的服务</text>
+
+      <rect x="620" y="105" width="150" height="58" rx="10" fill="#161b22" stroke="#bc8cff" stroke-width="1.5"/>
+      <text x="695" y="130" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600">🌍 海外 VPS</text>
+      <text x="695" y="150" text-anchor="middle" fill="#8b949e" font-size="11">Exit Node · DERP · 镜像加速</text>
+
+      <rect x="410" y="185" width="180" height="58" rx="10" fill="#161b22" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="500" y="210" text-anchor="middle" fill="#e6edf3" font-size="14" font-weight="600">🏠 家里 NAS + 电脑</text>
+      <text x="500" y="230" text-anchor="middle" fill="#8b949e" font-size="11">Subnet Router · 片库 · 备份 · 相册</text>
+    </g>
+
+    <!-- outside devices -->
+    <rect x="30" y="230" width="140" height="52" rx="10" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+    <text x="100" y="252" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="600">💻 MacBook</text>
+    <text x="100" y="270" text-anchor="middle" fill="#8b949e" font-size="11">Claude Code 主力</text>
+
+    <rect x="830" y="230" width="140" height="52" rx="10" fill="#161b22" stroke="#d29922" stroke-width="1.5"/>
+    <text x="900" y="252" text-anchor="middle" fill="#e6edf3" font-size="13" font-weight="600">📱 手机 / iPad</text>
+    <text x="900" y="270" text-anchor="middle" fill="#8b949e" font-size="11">Happy 远程接管</text>
+
+    <line x1="170" y1="240" x2="400" y2="210" stroke="#39c5cf" stroke-width="1.2" marker-end="url(#arrow)" opacity="0.7"/>
+    <line x1="830" y1="240" x2="600" y2="210" stroke="#39c5cf" stroke-width="1.2" marker-end="url(#arrow)" opacity="0.7"/>
+
+    <text x="500" y="320" text-anchor="middle" fill="#8b949e" font-size="12">所有连线 = WireGuard 加密隧道 · 公网 IP 不再是前提 · 服务只监听 tailnet = 天然防火墙</text>
+  </svg>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h3><span class="emoji">🧠</span>核心认知</h3>
+    <ul>
+      <li>公网服务器之间其实不需要 Tailscale——它的价值是<span class="highlight">统一认证 + ACL + MagicDNS</span>，机器一多裸管 SSH 会疯</li>
+      <li>家里没公网 IP 才是 Tailscale 不可替代的地方</li>
+      <li>家里只需<span class="highlight">一台</span>设备做 Subnet Router，整个 192.168.x.x 内网全部入网</li>
+      <li>海外 VPS 一键当全家 Exit Node，比机场干净、独享 IP</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h3><span class="emoji">🇨🇳</span>大陆网络的现实</h3>
+    <ul>
+      <li>官方 DERP 中继在大陆体验差 → <span class="highlight">在海外 VPS 自建 DERP</span></li>
+      <li>对称 NAT 打洞失败时，走自建中继，速度自己掌控</li>
+      <li>控制面可用 <span class="highlight">Headscale</span> 自托管，彻底零依赖</li>
+      <li>WireGuard 流量特征明显，敏感时期 UDP 可能被 QoS，留 udp2raw 之类的兜底</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ 挣钱 ============ -->
+<h2 class="money">💰 能挣钱吗？能。按靠谱程度排序</h2>
+<p class="section-sub">标注：💵收益预期 · ⚡启动难度 · ⚠️风险</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h3><span class="emoji">1️⃣</span>独立开发 / 出海 SaaS</h3>
+    <p>这套基础设施 = <span class="highlight">接近零成本的产品后端</span>。CI runner、数据库、对象存储、监控全自建，毛利直接拉满。海外节点天然贴近海外用户，是做出海产品的完美底座。这是这套网络<span class="highlight">上限最高</span>的用法。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵💵💵 上不封顶</span>
+      <span class="badge b-orange">⚡⚡⚡ 长期投入</span>
+      <span class="badge b-green">✅ 完全合法</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">2️⃣</span>接私活的"专业外挂"</h3>
+    <p>客户要看进度？给他一个 <span class="highlight">preview.你的域名.ts.net</span> 的 Tailscale 分享链接，实时预览环境秒开。demo 环境、客户专属演示站、交付前的 staging——别人用 ngrok 临时凑合，你有企业级体验，报价都能硬气点。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵💵 立竿见影</span>
+      <span class="badge b-green">⚡ 一周搞定</span>
+      <span class="badge b-green">✅ 完全合法</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">3️⃣</span>技术自媒体 / 付费专栏</h3>
+    <p>你折腾的每一步都是内容素材：「大陆程序员自建私有云全记录」「Headscale 实战」「我的异地容灾备份方案」。博客 + 小报童付费专栏 + 知识星球 + B站。折腾本身不挣钱，<span class="highlight">折腾的记录</span>挣钱。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵 长尾收入</span>
+      <span class="badge b-green">⚡ 顺手就做</span>
+      <span class="badge b-green">✅ 完全合法</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">4️⃣</span>技能变现：简历镀金</h3>
+    <p>别笑，这是最稳的"挣钱"。tailnet + k3s + 监控 + 容灾备份 + Headscale 自托管 = 一套完整的<span class="highlight">私有云原生实战</span>。面试时打开自己的 Grafana 集群面板给对方看，比任何证书都有说服力。涨薪 20% 就是最大的 ROI。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵💵 间接但确定</span>
+      <span class="badge b-green">⚡⚡ 边玩边学</span>
+      <span class="badge b-green">✅ 完全合法</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">5️⃣</span>PCDN：卖家里上行带宽</h3>
+    <p>网心云、京东云无线宝这一类：闲置宽带 + NAS 硬盘跑边缘缓存节点，每月几十到几百块被动收入。注意：<span class="highlight">运营商对 PCDN 越来越敏感</span>，可能被限速或要求整改，别拿主宽带梭哈，副宽带/备用线路试水。</p>
+    <div class="badges">
+      <span class="badge b-orange">💵 几十~几百/月</span>
+      <span class="badge b-green">⚡ 开箱即用</span>
+      <span class="badge b-orange">⚠️ 运营商封号风险</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">6️⃣</span>Storj / DePIN：出租 NAS 硬盘</h3>
+    <p>Storj 让你把闲置磁盘空间租给分布式存储网络赚代币；类似的还有各类 DePIN 带宽/存储项目。收益不高且以代币结算、波动大，但<span class="highlight">硬盘反正空着</span>，挂着呗。注意甄别项目，九成的"共享带宽躺赚"是盘。</p>
+    <div class="badges">
+      <span class="badge b-orange">💵 零花钱级</span>
+      <span class="badge b-green">⚡ 挂个容器</span>
+      <span class="badge b-orange">⚠️ 代币波动 + 项目跑路风险</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">7️⃣</span>爬虫 / 数据服务</h3>
+    <p>分布式节点 = 天然的多 IP 爬虫集群（家里住宅 IP + 国内机房 IP + 海外 IP 三种出口）。做价格监控、舆情监控、竞品追踪，给小卖家/小团队卖订阅制的数据报表。n8n + 定时任务就能搭出 MVP。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵 可做产品</span>
+      <span class="badge b-orange">⚡⚡ 要懂反爬</span>
+      <span class="badge b-orange">⚠️ 注意目标站条款与合规</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">8️⃣</span>小微企业代维 / 监控托管</h3>
+    <p>很多小工作室没有运维。你用 Uptime Kuma + Netdata 模板化部署，给他们卖「服务器托管 + 监控 + 告警 + 备份」的月费套餐，一户收几百，十户就是一份副业。你的 tailnet 就是管理通道，安全又方便。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵 稳定月费</span>
+      <span class="badge b-orange">⚡⚡ 要拉客户</span>
+      <span class="badge b-green">✅ 合法（注意别碰别人的翻墙需求）</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">9️⃣</span>AI 应用套利</h3>
+    <p>海外 VPS + 家里的算力跑 Ollama，给 Claude Code / Cursor 之外补一层免费模型；或者包装成小工具卖给非技术人群（公众号排版 AI、跨境电商文案 AI）。你的网络让<span class="highlight">推理成本≈电费</span>，卖的却是 SaaS 价。</p>
+    <div class="badges">
+      <span class="badge b-green">💵💵💵💵 想象空间大</span>
+      <span class="badge b-orange">⚡⚡⚡ 要做产品</span>
+      <span class="badge b-green">✅ 合法</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="callout callout-red">
+  <strong>🚫 一条红线：不要把节点卖给别人翻墙。</strong>
+  <p>自建给自己用是灰色但普遍；<strong>出售/出租翻墙服务在国内是明确违法的</strong>（非法经营罪已有大量判例），这条无论多赚钱都不要碰。同样，抢茅台/抢票 bot 这类灰产也建议远离——挣的是小钱，担的是刑责。</p>
+</div>
+
+<div class="callout callout-green">
+  <strong>💡 挣钱的真相排序</strong>
+  <p>对程序员来说，这套网络最大的变现路径不是挖矿、不是挂 PCDN，而是：<strong>降低你自己产品的运营成本 → 把省下的精力和钱投入到做产品/内容/接单上</strong>。基础设施是杠杆，不是产品本身。</p>
+</div>
+
+<!-- ============ 脑洞 ============ -->
+<h2 class="wild">🚀 脑洞区：不一定挣钱，但很酷</h2>
+<p class="section-sub">这些玩法里说不定藏着下一个产品灵感。</p>
+
+<div class="grid">
+
+  <div class="card">
+    <h3><span class="emoji">🌍</span>双视角网络观测站</h3>
+    <p>墙内探针 + 墙外探针同时监控你的网站：被没被墙、CDN 配得对不对、海外用户打开多慢，一屏看清。做出海业务的人愿意为这个视角付钱。</p>
+    <div class="badges"><span class="badge b-purple">🧪 可产品化</span><span class="badge b-cyan">⚡ 一天搭完</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">📦</span>Docker/GitHub 加速联盟</h3>
+    <p>海外节点当 registry mirror + GitHub proxy，tailnet 内网分发。拉镜像从 20 分钟变 20 秒。做成工具开源出去，大概率是你 star 数最高的项目。</p>
+    <div class="badges"><span class="badge b-purple">🧪 开源影响力</span><span class="badge b-cyan">⚡ 极其实用</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🎬</span>全自动追片流水线</h3>
+    <p>Overseerr 点片 → Prowlarr 找种 → qBittorrent 海外节点下载（版权内容海外 VPS 反而安全）→ 内网同步回 NAS → Jellyfin 刮削入库 → Telegram 通知你"可以看了"。你在群里发一句"想看 XX"，晚上它就躺在你的片库里。</p>
+    <div class="badges"><span class="badge b-purple">🎉 幸福感第一</span><span class="badge b-cyan">⚡⚡ 两天搭完</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🤖</span>AI 家庭管家</h3>
+    <p>NAS 上跑 Ollama + Open WebUI + n8n：自动整理相册（Immich 人脸识别）、自动给下载的电影重命名、每天早上把「服务器健康报告 + 今日日程 + 资讯摘要」推到你微信/TG。家里所有设备都能免费调用。</p>
+    <div class="badges"><span class="badge b-purple">🧪 可产品化</span><span class="badge b-cyan">⚡⚡ 渐进搭建</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🎮</span>全球同服游戏局</h3>
+    <p>Minecraft / 幻兽帕鲁 / 泰拉瑞亚私服挂在国内 VPS，海外朋友走 tailnet 直连，延迟比官方服务器还低。周末联机局的快乐，无价。</p>
+    <div class="badges"><span class="badge b-purple">🎉 社交货币</span><span class="badge b-cyan">⚡ 一小时</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🔐</span>数字遗产保险柜</h3>
+    <p>Vaultwarden（密码）+ restic（加密备份）+ 三地副本（NAS / 国内 VPS / 海外 VPS）。再配一个 dead man's switch：N 天没签到就把指定资料发给指定的人。极客的终极浪漫。</p>
+    <div class="badges"><span class="badge b-purple">🧠 真·容灾</span><span class="badge b-cyan">⚡⚡ 值得认真做</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">⛏️</span>挖矿的现实</h3>
+    <p>XMRig 限 50% CPU 挖门罗：技术上行，经济上 VPS 的 vCPU 超售严重，<span class="highlight">收益大概率是负数</span>，且云厂商 TOS 明令禁止（检测到封号）。想玩只在自家物理机上跑，当学习。</p>
+    <div class="badges"><span class="badge b-red">💵 基本是负的</span><span class="badge b-orange">⚠️ VPS 会封号</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🛰️</span>异地容灾演练</h3>
+    <p>每季度做一次"灾难演习"：假装 NAS 挂了，从海外 VPS 的 restic 仓库恢复全部数据，计时并记录。99% 的人有备份，1% 的人验证过备份能恢复——你是那 1%。</p>
+    <div class="badges"><span class="badge b-purple">🧠 工程素养</span><span class="badge b-cyan">⚡ 半天/季度</span></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="emoji">🧪</span>k3s 家庭实验室</h3>
+    <p>几台 VPS + 家里机器组跨地域 k3s 集群，部署自己的 side project 练手云原生：Ingress、Helm、ArgoCD GitOps 全家桶。简历上写"独立运维跨 3 地域 K8s 集群"，面试官眼睛会亮。</p>
+    <div class="badges"><span class="badge b-purple">🧠 涨薪杠杆</span><span class="badge b-cyan">⚡⚡⚡ 持续投入</span></div>
+  </div>
+
+</div>
+
+<!-- ============ 对照表 ============ -->
+<h2>📊 一页速查表</h2>
+<p class="section-sub">不知道先干啥的时候看这个。</p>
+
+<div class="diagram">
+  <table>
+    <tr><th>玩法</th><th>收益</th><th>启动成本</th><th>合法性</th><th>推荐指数</th></tr>
+    <tr><td>出海 SaaS / 独立开发</td><td>💵💵💵💵💵</td><td>高</td><td>✅</td><td>⭐⭐⭐⭐⭐</td></tr>
+    <tr><td>私活预览环境</td><td>💵💵💵💵</td><td>低</td><td>✅</td><td>⭐⭐⭐⭐⭐</td></tr>
+    <tr><td>技术自媒体 / 付费专栏</td><td>💵💵💵</td><td>低</td><td>✅</td><td>⭐⭐⭐⭐</td></tr>
+    <tr><td>简历镀金（k3s/容灾）</td><td>💵💵💵💵（间接）</td><td>中</td><td>✅</td><td>⭐⭐⭐⭐</td></tr>
+    <tr><td>追片流水线 / Jellyfin</td><td>🎉 幸福感</td><td>低</td><td>✅（个人使用）</td><td>⭐⭐⭐⭐⭐</td></tr>
+    <tr><td>AI 家庭管家</td><td>💵💵💵（潜力）</td><td>中</td><td>✅</td><td>⭐⭐⭐⭐</td></tr>
+    <tr><td>爬虫数据服务</td><td>💵💵💵</td><td>中</td><td>⚠️ 注意合规</td><td>⭐⭐⭐</td></tr>
+    <tr><td>PCDN 带宽变现</td><td>💵</td><td>极低</td><td>⚠️ 运营商风险</td><td>⭐⭐</td></tr>
+    <tr><td>Storj / DePIN</td><td>💵</td><td>极低</td><td>⚠️ 代币风险</td><td>⭐⭐</td></tr>
+    <tr><td>CPU 挖矿</td><td>负</td><td>低</td><td>⚠️ VPS 封号</td><td>⭐</td></tr>
+    <tr><td>卖翻墙节点</td><td>—</td><td>—</td><td>🚫 违法</td><td>❌ 别碰</td></tr>
+  </table>
+</div>
+
+<!-- ============ 路线图 ============ -->
+<h2>🗺️ 落地路线图</h2>
+<p class="section-sub">每一步都独立可用，不做后面也不亏。</p>
+
+<div class="roadmap">
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>地基：tailnet 全覆盖 + 自建 DERP</h4>
+      <p>所有设备入网；海外 VPS 自建 DERP relay 解决大陆中继慢的问题；MagicDNS 开启；ACL 粗分（服务器/个人设备/NAS 三组）。<code>tailscale up --advertise-exit-node</code></p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>家：NAS 入网 + Subnet Router</h4>
+      <p>家里挑一台常开设备 <code>--advertise-routes=192.168.x.0/24</code>，全屋内网进 tailnet；开启 <code>tailscale cert</code> 给内部服务签 HTTPS。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>命：restic 三地备份</h4>
+      <p>NAS → 国内 VPS → 海外 VPS 的 3-2-1 备份跑起来。这一步不做，前面全是沙上建塔。配 cron + 恢复演练提醒。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>眼：Uptime Kuma + Netdata + 双视角探针</h4>
+      <p>国内/海外双探针上线，全集群一个 dashboard。从此你的网络是有"感觉"的。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>乐：Jellyfin + 追片流水线 + Immich</h4>
+      <p>Overseerr → Prowlarr → qBittorrent → Jellyfin 全自动；手机相册自动备份。幸福感最强的一步。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>钱：选一个变现方向启动</h4>
+      <p>从「私活预览环境」或「折腾记录发专栏」开始——成本最低、见效最快。出海 SaaS 作为长期主线并行酝酿。</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num"></div>
+    <div class="step-body">
+      <h4>深：Headscale + k3s（可选进阶）</h4>
+      <p>控制面自托管、跨地域 K8s 集群。玩到这一步，你已经是一个人的云计算公司了。</p>
+    </div>
+  </div>
+</div>
+
+<div class="callout callout-blue">
+  <strong>🎯 一句话总结</strong>
+  <p>挖矿和挂机是这套网络<strong>最差</strong>的用法——把算力换成钱，一度电挣不了一度电的钱。最好的用法是把它当成<strong>你个人产品的免费云</strong>：省下的每一分云服务费、做出的每一个小产品、写下的每一篇折腾记录，才是真正能长大的钱。</p>
+</div>
+
+<footer>
+  🌐 Tailnet 脑洞玩法大全 · 生成于 2026-07-21 · 供个人折腾参考
+</footer>
+
+</div>
+</body>
+</html>
