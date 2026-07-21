@@ -197,6 +197,28 @@ tar -czf happy-backup-$(date +%F).tar.gz /root/.happy/server-light/   # 备份
 | 会话列表正常,点进去无限 loading | 服务端缺 v3 接口（见 4.1） |
 | Caddy 502 | `ufw allow in on docker0` |
 | 语音功能不可用 | 已知限制：App 写死官方 ElevenLabs agent ID（slopus/happy#472） |
+| 手机创建会话报 Process exited unexpectedly（daemon 路径） | 两大高频原因：① daemon 由 systemd 启动，不加载 `.bashrc`，拉起的 claude 没有 API 凭证直接闪退——`ExecStart` 用 `/bin/bash -lc "..."` 包一层；② 以 root 运行且会话为 bypassPermissions 模式，新版 claude 直接拒绝（日志里 `--dangerously-skip-permissions cannot be used with root`）——见下文「用普通用户运行」。日志位置 `~/.happy/logs/*daemon*.log` |
+| tmux 里 happy 反复刷 Continuing Claude session | 同上 root 检查，进程陷入崩溃重试循环。注意：修复前启动的旧进程不会自动获得新环境变量，必须 `source ~/.bashrc` 后重启 happy |
+| 修复后旧会话仍报 Process exited unexpectedly | 修复前创建的会话是"尸体"，终态不可逆，App 里归档删除即可，认准修复后新建的会话 |
+| Auth conflict: Both a token and an API key are set | 环境里同时存在 `ANTHROPIC_AUTH_TOKEN` 和 `ANTHROPIC_API_KEY`（多为 `.bashrc` 残留旧 key），删除或 `unset` 其一 |
+| 同是 claude 行为却不一致（有的会话正常有的报错） | 检查双版本共存：native 安装（`~/.local/share/claude`）与 npm 全局并存时行为可能不同（如 root 检查是新版加的）。`which claude` 确认解析路径，只保留一个 |
+| npm 全局安装后 claude 命令失效/空壳 | 安装中断会留残目录，后续安装报 EEXIST/ENOTEMPTY 静默失败。`rm -rf` 包目录后 `--force` 重装，装完必须 `claude --version` 验证，别信 exit code |
+
+### 用普通用户运行 claude（强烈建议）
+
+Happy 默认以 bypassPermissions（Yolo）模式启动 claude，若再以 root 运行，等于"任意命令免确认 + 系统最高权限"双重敞开。新版 claude 会直接拒绝这种组合（可用 `IS_SANDBOX=1` 绕过，但风险依旧在）。合理做法是建普通用户（如 `dev`）专门跑 claude：
+
+```bash
+useradd -m -s /bin/bash dev
+mv /root/.happy /root/.claude /root/.claude.json /root/claude-app /home/dev/
+cp /root/.bashrc /home/dev/.bashrc   # 含 API 凭证、HAPPY_SERVER_URL 等
+chown -R dev:dev /home/dev
+```
+
+- daemon 的 systemd 单元加 `User=dev`，`ExecStart` 用 `bash -lc` 加载 dev 的环境
+- tmux 会话用 `su - dev -c "tmux new-session -d -s 名字 -c 项目目录"` 重建
+- 爆炸半径锁在 dev 用户内：即便 claude 执行了破坏性命令，系统、中继、证书均不受影响
+- root 只保留给系统运维；中继、Caddy、acme.sh 本就应留在 root
 
 ---
 
