@@ -211,6 +211,8 @@ Happy 默认以 bypassPermissions（Yolo）模式启动 claude，若再以 root 
 ```bash
 useradd -m -s /bin/bash dev
 mv /root/.happy /root/.claude /root/.claude.json /root/claude-app /home/dev/
+# ⚠️ 中继数据必须留在 root（happy-server 服务以 root 运行），搬回去：
+mkdir -p /root/.happy && mv /home/dev/.happy/server-light /root/.happy/server-light
 cp /root/.bashrc /home/dev/.bashrc   # 含 API 凭证、HAPPY_SERVER_URL 等
 chown -R dev:dev /home/dev
 ```
