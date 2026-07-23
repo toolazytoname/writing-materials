@@ -10,6 +10,8 @@
 | 2026-07-21 | [Tailnet 脑洞玩法大全 — 从自嗨到挣钱](docs/tailnet-brainstorm.html) | 单页 HTML:Tailscale 网络的玩法合集,从个人自用到变现思路 |
 | 2026-07-21 | [个人云笔记系统方案](docs/个人笔记系统方案.md) | 以本地 Markdown 为核心的多端同步笔记方案:手机流畅查看/搜索 + 移动端 AI,含已拍板决策与待办清单 |
 | 2026-07-22 | [无浏览器服务器如何完成 Codex OAuth 登录](docs/cliproxyapi-codex-oauth-flow-zh.md) | CLIProxyAPI 远程认证全流程图解:OAuth 回调接收器 + SSH 本地端口转发,浏览器登录与服务器令牌分离,基于终端日志 + 源码分析 |
+| 2026-07-23 | [MerlinClash 残留 iptables 规则导致境外网络不通 — 故障报告](docs/merlinclash-残留规则故障报告.md) | 梅林路由插件"已关闭"却仍在劫持流量:残留 iptables 规则排查与清理实录,典型的"插件关了故障还在"踩坑案例 |
+| 2026-07-23 | [随身 4G/5G 路由器选购调研](docs/随身路由器选购调研.md) | 目标"客户端零配置翻墙":流量卡随身路由 + OpenWrt 代理插件 + 自建 VPS,结论首选 GL.iNet GL-X3000,含全系型号对照 |
 
 ## 配套仓库
 
